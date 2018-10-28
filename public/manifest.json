@@ -1,0 +1,13 @@
+{
+  "short_name": "Maps",
+  "name": "Test Maps",
+  "icons": [
+    {
+      "src": "https://daks2k3a4ib2z.cloudfront.net/5974035e6c61e53cfc12ab68/5a3a31dabf53560001f7ca37_Neat%20Personal%20Favicon%2032.png",
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
