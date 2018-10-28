@@ -19,22 +19,29 @@ class GoogleMaps extends Component {
     this.updateMarkers = this.updateMarkers.bind(this);
   }
 
+  /**
+    * @desc trigger to re-render google maps
+  **/
   updateMarkers() {
     var bounds = new this.props.google.maps.LatLngBounds();
     var categories = [];
 
+    // only update markers, legends, and bounds when all location data are returned from google geocoder
     if (common.data.length === common.locations.length) {
       var markers = common.locations.map((i) => {
         var key = i.lat.toString() + "," + i.lng.toString();
         var location = Object.assign({}, i);
         delete location.category;
 
+        // add category into the list if it hasn't been in the list
         if (categories.indexOf(i.category) < 0) {
           categories.push(i.category);
         }
 
+        // group different category and for putting onto the label of each marker
         var categoryIndex = categories.indexOf(i.category).toString();
 
+        // add location within the bounds so that google maps can readjust its zoom and center based on the markers
         bounds.extend(location);
 
         return (
@@ -51,6 +58,7 @@ class GoogleMaps extends Component {
         )
       });
 
+      // triggers re-render with new legends, markers, and bounds
       this.setState({
         legends: legends,
         markers: markers,
@@ -60,6 +68,7 @@ class GoogleMaps extends Component {
   }
 
   render() {
+    // call google geocoder to get lat lng from address
     var geocoder = async (i, address) => {
       await Geocode.fromAddress(address).then(
         response => {

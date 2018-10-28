@@ -9,20 +9,32 @@ class MatchTable extends Component {
     common.updateRawData = common.updateRawData.bind(this);
   }
 
+  /**
+    * @desc triggers when specify type of data in table column
+  **/
   handleMatch() {
     var columnMatch = this.formToJSON(document.getElementById('match'));
     var values = Object.values(columnMatch);
 
     var foundDuplicate = values.find((element, index) => (values.indexOf(element) !== index));
 
+    // if any type of data is selected more than once or not selected, do not proceed; otherwise, triggers re-render of google maps
     if (foundDuplicate) {
-      alert("duplicate found");
+      alert("Please select each type of data once only");
+      return;
+    } else if (values.includes('')) {
+      alert("Please select type of data for all columns");
       return;
     }
     
     common.updateGoogleMaps(columnMatch);
   }
 
+  /**
+    * @desc construct JSON from table
+    * @parameter html table
+    * @return JSON
+  **/
   formToJSON(table){
     var keyName;
     var keyNames = [];
@@ -39,7 +51,7 @@ class MatchTable extends Component {
     for (var j = 0; j < numOfCols; j++){
       var inputValue = table.rows[0].cells[j].children[0].value || '';
 
-      objectArray.push("\"" + keyNames[j] + "\":" + "\"" + inputValue + "\"");
+      objectArray.push("\"" + keyNames[j] + "\":\"" + inputValue + "\"");
 
       if(j < (numOfCols - 1)){
         objectArray.push(",\n");
@@ -68,7 +80,7 @@ class MatchTable extends Component {
       return (
         <td key={i}>
           <select>
-            <option value=""></option>
+            <option value="">Please select</option>
             <option value="address">Address</option>
             <option value="city">City</option>
             <option value="state">State</option>
@@ -91,7 +103,6 @@ class MatchTable extends Component {
         </table>
       </div>
     )
-    // return header
   }
 }
 

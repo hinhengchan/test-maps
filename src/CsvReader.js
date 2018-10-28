@@ -16,6 +16,9 @@ class CsvReader extends Component {
     this.handleUpload = this.handleUpload.bind(this)
   }
 
+  /**
+    * @desc trigger when new csv is uploaded
+  **/
   handleUpload(data, filename) {
     var dataMaps = this.state.dataMaps;
     var dataMap = {};
@@ -28,15 +31,20 @@ class CsvReader extends Component {
       return;
     }
 
+    // only keep 3 previously uploaded csv
     if (dataMaps.length === 3) {
       dataMaps.shift();
     }
 
     dataMaps.push(dataMap);
 
+    // trigger to update upload history
     common.updateRawDataMaps(dataMaps);
   };
 
+  /**
+    * @desc triggers when reset button is clicked
+  **/
   resetData() {
     common.updateRawDataMaps([]);
     common.updateRawData([]);
@@ -67,7 +75,11 @@ class CsvHistory extends Component {
     common.updateRawDataMaps = common.updateRawDataMaps.bind(this);
   }
 
+  /**
+    * @desc triggers when uploaded csv is selected
+  **/
   displayData(data) {
+    // trigger to update data shown in table
     common.updateRawData(data);
   }
 
