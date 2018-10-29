@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import common from './common';
 import './MatchTable.css';
 
@@ -6,15 +6,21 @@ class MatchTable extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      data: []
+    }
+
     common.updateRawData = common.updateRawData.bind(this);
   }
 
   /**
     * @desc triggers when specify type of data in table column
   **/
-  handleMatch() {
+  handleMatch(data) {
     var columnMatch = this.formToJSON(document.getElementById('match'));
     var values = Object.values(columnMatch);
+    var currentData = data.slice(0);
+    currentData.unshift(values);
 
     var foundDuplicate = values.find((element, index) => (values.indexOf(element) !== index));
 
@@ -27,7 +33,7 @@ class MatchTable extends Component {
       return;
     }
     
-    common.updateGoogleMaps(columnMatch);
+    common.updateGoogleMaps(currentData, []);
   }
 
   /**
@@ -64,7 +70,7 @@ class MatchTable extends Component {
   }
 
   render() {
-    var valueData = common.data;
+    var valueData = this.state.data;
     var value = valueData.map((i) => {
       var v = i.map((j) => {
         return <th key={j}>{j}</th>
@@ -75,7 +81,7 @@ class MatchTable extends Component {
       </tr>
     })
 
-    var headerData = common.data[0] || common.data;
+    var headerData = this.state.data[0] || this.state.data;
     var header = headerData.map((i) => {
       return (
         <td key={i}>
@@ -94,7 +100,7 @@ class MatchTable extends Component {
     return (
       <div>
         <label id="match-table-label">Select type of data for the corresponding columns</label>
-        <input id="match_submit" type="submit" value="submit" onClick={this.handleMatch.bind(this)} />
+        <input id="match_submit" type="submit" value="submit" onClick={this.handleMatch.bind(this, this.state.data)} />
         <table id="match">
           <tbody>
             <tr>{header}</tr>

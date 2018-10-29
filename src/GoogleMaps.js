@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import {Map, Marker, GoogleApiWrapper} from 'google-maps-react';
 import Geocode from "react-geocode";
 import common from './common';
@@ -9,6 +9,8 @@ class GoogleMaps extends Component {
     super(props);
 
     this.state = {
+      data: [],
+      locations: [],
       legends: [],
       markers: [],
       bounds: {}
@@ -22,13 +24,15 @@ class GoogleMaps extends Component {
   /**
     * @desc trigger to re-render google maps
   **/
-  updateMarkers() {
+  updateMarkers(locations) {
     var bounds = new this.props.google.maps.LatLngBounds();
     var categories = [];
+    var currentData = this.state.data.slice(0);
+    currentData.shift();
 
     // only update markers, legends, and bounds when all location data are returned from google geocoder
-    if (common.data.length === common.locations.length) {
-      var markers = common.locations.map((i) => {
+    if (currentData.length === locations.length) {
+      var markers = locations.map((i) => {
         var key = i.lat.toString() + "," + i.lng.toString();
         var location = Object.assign({}, i);
         delete location.category;
@@ -72,11 +76,11 @@ class GoogleMaps extends Component {
     var geocoder = async (i, address) => {
       await Geocode.fromAddress(address).then(
         response => {
-          var data = response.results[0].geometry.location;
-          data.category = common.data[i][categoryIndex];
-          
-          common.locations.push(data);
-          this.updateMarkers();
+          var location = response.results[0].geometry.location;
+          location.category = this.state.data[i][categoryIndex];
+
+          this.state.locations.push(location);
+          this.updateMarkers(this.state.locations);
         },
         error => {
           console.error(error);
@@ -84,14 +88,18 @@ class GoogleMaps extends Component {
       );
     }
 
-    for (var i = 0; i < common.data.length; i++) {
-      var addressIndex = Object.values(common.columnMatch).indexOf('address');
-      var cityIndex = Object.values(common.columnMatch).indexOf('city');
-      var stateIndex = Object.values(common.columnMatch).indexOf('state');
-      var zipcodeIndex = Object.values(common.columnMatch).indexOf('zipcode');
-      var categoryIndex = Object.values(common.columnMatch).indexOf('category');
+    for (var i = 0; i < this.state.data.length; i++) {
+      var headerValue = this.state.data[0];
+      var addressIndex = Object.values(headerValue).indexOf('address');
+      var cityIndex = Object.values(headerValue).indexOf('city');
+      var stateIndex = Object.values(headerValue).indexOf('state');
+      var zipcodeIndex = Object.values(headerValue).indexOf('zipcode');
+      var categoryIndex = Object.values(headerValue).indexOf('category');
 
-      var address = common.data[i][addressIndex] + "," + common.data[i][cityIndex] + "," + common.data[i][stateIndex] + "," + common.data[i][zipcodeIndex];
+      if (i === 0) {
+        continue;
+      }
+      var address = this.state.data[i][addressIndex] + "," + this.state.data[i][cityIndex] + "," + this.state.data[i][stateIndex] + "," + this.state.data[i][zipcodeIndex];
       geocoder(i, address);
     }
 

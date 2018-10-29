@@ -13,7 +13,6 @@ var common = {
     this.setState({ 
       data: data
     });
-    common.data = data;
 
     // if data is not empty, show match-container; otherwise, hide it
     if (data.length > 0) {
@@ -53,38 +52,32 @@ var common = {
   },
   /**
     * @desc triggers when type of data is selected, for updating google maps
-    * @param obect $columnMatch - object of selected type of data for each column - eg.
-        {
-          0: "category"
-          1: "state"
-          2: "city"
-          3: "zipcode"
-          4: "address"
-        }
+    * @param array $data - array of address with header - eg.
+        [
+          ["category", "state", "city", "zipcode", "address"]
+          ["one-family dwelling", "CA", "Foster City", "94404", "2545, 777 Shell Blvd"]
+          ["restricted density multiple dwelling", "CA", "Menlo Park", "94025", "2800 Sand Hill Road"]
+          ...
+        ]
+    * @param array $locations - array of locations with lat, lng, and category - eg.
+        [
+          {
+            "lat": "",
+            "lng": "",
+            "category": "one-family dwelling",
+          }
+          ...
+        ]
   **/
-  updateGoogleMaps: function(columnMatch){
-    this.setState({ 
-      columnMatch: columnMatch
+  updateGoogleMaps: function(data, locations){
+    this.setState({
+      data: data,
+      locations: locations
     });
-    common.locations = [];
-    common.columnMatch = columnMatch;
 
     document.getElementById('match-container').style.display = "none";
     document.getElementById('google-maps').style.display = "block";
   },
-  // raw data for display
-  data: [],
-  // type of data for each column
-  columnMatch: {},
-  /**
-    * location responsed from google maps geocoder with associated category from csv, eg. 
-      {
-        "lat": "",
-        "lng": "",
-        "category": ""
-      }
-  **/ 
-  locations: [],
   // google maps api key
   googleApiKey: "AIzaSyBoU_G9Vlm_vf0KlhnmcPeA0pO3vl-7dnk"
 }
