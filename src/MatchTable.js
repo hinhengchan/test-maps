@@ -7,7 +7,8 @@ class MatchTable extends Component {
     super(props);
 
     this.state = {
-      data: []
+      data: [],
+      headers: []
     }
 
     common.updateRawData = common.updateRawData.bind(this);
@@ -16,7 +17,7 @@ class MatchTable extends Component {
   /**
     * @desc triggers when specify type of data in table column
   **/
-  handleMatch(data) {
+  handleMatch(data, headers) {
     var columnMatch = this.formToJSON(document.getElementById('match'));
     var values = Object.values(columnMatch);
     var currentData = data.slice(0);
@@ -24,16 +25,22 @@ class MatchTable extends Component {
 
     var foundDuplicate = values.find((element, index) => (values.indexOf(element) !== index));
 
-    // if any type of data is selected more than once or not selected, do not proceed; otherwise, triggers re-render of google maps
     if (foundDuplicate) {
+      // if any type of data is selected more than once, do not proceed
       alert("Please select each type of data once only");
       return;
     } else if (values.includes('')) {
+      // if any type of data is not selected, do not proceed
       alert("Please select type of data for all columns");
+      return;
+    } else if (currentData[0].length !== headers.length) {
+      // if csv has invalid number of columns, do not proceed
+      alert("Please upload csv with correct number of columns")
       return;
     }
     
-    common.updateGoogleMaps(currentData, []);
+    // otherwise, triggers re-render of google maps
+    common.updateGoogleMaps(currentData, [], headers);
   }
 
   /**
@@ -70,6 +77,13 @@ class MatchTable extends Component {
   }
 
   render() {
+    var headers = ["address", "city", "state", "zipcode", "category"];
+    var options = headers.map((index) => {
+      return (
+        <option key={index} value={index}>{index}</option>
+      )
+    })
+
     var valueData = this.state.data;
     var value = valueData.map((i) => {
       var v = i.map((j) => {
@@ -87,11 +101,7 @@ class MatchTable extends Component {
         <td key={i}>
           <select>
             <option value="">Please select</option>
-            <option value="address">Address</option>
-            <option value="city">City</option>
-            <option value="state">State</option>
-            <option value="zipcode">Zipcode</option>
-            <option value="category">Category</option>
+            {options}
           </select>
         </td>
       )
@@ -100,7 +110,7 @@ class MatchTable extends Component {
     return (
       <div>
         <label id="match-table-label">Select type of data for the corresponding columns</label>
-        <input id="match_submit" type="submit" value="submit" onClick={this.handleMatch.bind(this, this.state.data)} />
+        <input id="match_submit" type="submit" value="submit" onClick={this.handleMatch.bind(this, this.state.data, headers)} />
         <table id="match">
           <tbody>
             <tr>{header}</tr>

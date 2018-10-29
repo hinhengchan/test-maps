@@ -69,10 +69,11 @@ var common = {
           ...
         ]
   **/
-  updateGoogleMaps: function(data, locations){
+  updateGoogleMaps: function(data, locations, headers){
     this.setState({
       data: data,
-      locations: locations
+      locations: locations,
+      headers: headers
     });
 
     document.getElementById('match-container').style.display = "none";

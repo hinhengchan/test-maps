@@ -11,6 +11,7 @@ class GoogleMaps extends Component {
     this.state = {
       data: [],
       locations: [],
+      headers: [],
       legends: [],
       markers: [],
       bounds: {}
@@ -73,11 +74,11 @@ class GoogleMaps extends Component {
 
   render() {
     // call google geocoder to get lat lng from address
-    var geocoder = async (i, address) => {
+    var geocoder = async (i, address, category) => {
       await Geocode.fromAddress(address).then(
         response => {
           var location = response.results[0].geometry.location;
-          location.category = this.state.data[i][categoryIndex];
+          location.category = category;
 
           this.state.locations.push(location);
           this.updateMarkers(this.state.locations);
@@ -88,19 +89,21 @@ class GoogleMaps extends Component {
       );
     }
 
-    for (var i = 0; i < this.state.data.length; i++) {
+    // starts from 1 since first row indicates category
+    for (var i = 1; i < this.state.data.length; i++) {
       var headerValue = this.state.data[0];
-      var addressIndex = Object.values(headerValue).indexOf('address');
-      var cityIndex = Object.values(headerValue).indexOf('city');
-      var stateIndex = Object.values(headerValue).indexOf('state');
-      var zipcodeIndex = Object.values(headerValue).indexOf('zipcode');
-      var categoryIndex = Object.values(headerValue).indexOf('category');
+      var index = [];
+      var address = [];
 
-      if (i === 0) {
-        continue;
+      for (var j = 0; j < this.state.headers.length; j++) {
+        index[j] = Object.values(headerValue).indexOf(this.state.headers[j]);
+        address.push(this.state.data[i][index[j]]);
       }
-      var address = this.state.data[i][addressIndex] + "," + this.state.data[i][cityIndex] + "," + this.state.data[i][stateIndex] + "," + this.state.data[i][zipcodeIndex];
-      geocoder(i, address);
+
+      // assume last element is category
+      var category = address.pop();
+
+      geocoder(i, address.join(","), category);
     }
 
     return (
